@@ -8,6 +8,6 @@ If you want to contribute to [Cyberpunk 2077 modding tool](https://github.com/rf
 - Play game :)
 - Upload `Cyberpunk 2077\bin\x64\Cyberpunk2077.log` to https://discord.gg/Epkq79kd96 and ping `@rfuzzo`
 - After upload, you should delete `Cyberpunk2077.log` then continue playing game and upload again.
-
+### Downloads: [Here](https://github.com/ducan0124567/CP77HookFileName/releases)
 ### How to uninstall:
 - Delete 2 dlls
