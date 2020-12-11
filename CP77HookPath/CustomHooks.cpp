@@ -24,13 +24,13 @@ LPVOID GetArchiveFunctionAddress()
 
 
 
-typedef INT64* (*FUCKDETROIT)(INT64*, UINT64);
+typedef INT64* (*HOOKON)(INT64*, UINT64);
 
-FUCKDETROIT fpFuckDetroit = NULL;
+HOOKON fpHookOn = NULL;
 
 
 
-INT64* tFuckDetroit(INT64* unk1, INT64 a2)
+INT64* tHookOn(INT64* unk1, INT64 a2)
 {
 	int rax = 0;
 	GetRax(rax);
@@ -68,13 +68,8 @@ INT64* tFuckDetroit(INT64* unk1, INT64 a2)
 			
 
 		}
-		int sizetemp = size;
-		while (sizetemp != 0)
-		{
-			sizetemp -= 1;
-			--v6;
-		}
-		
+		v6 -= size;
+
 		
 		std::string str(v5, size);
 
@@ -87,13 +82,10 @@ INT64* tFuckDetroit(INT64* unk1, INT64 a2)
 				outfile << str[i];
 		}
 
-
-		
-
 	}
 	SetRax(rax);
 
-	INT64* res = fpFuckDetroit(unk1, a2);
+	INT64* res = fpHookOn(unk1, a2);
 
 	if (size > 0)
 	{
@@ -105,19 +97,7 @@ INT64* tFuckDetroit(INT64* unk1, INT64 a2)
 	mtx.unlock();
 	return res;
 }
-/*
-INT64 lowercase(__int64 a1)
-{
-	if (dword_144942074)
-	{
-		LODWORD(a1) = sub_142901A64(a1, 0i64);
-	}
-	else if ((unsigned int)(a1 - 65) <= 0x19)
-	{
-		LODWORD(a1) = a1 + 32;
-	}
-	return (unsigned int)a1;
-}*/
+
 
 void UnHooks()
 {
@@ -131,7 +111,7 @@ void SetupHooks()
 	MH_Initialize();
 
 	outfile.open("Cyberpunk2077.log", std::ios::out | std::ios::app);
-	if (MH_CreateHook(hookAddress, &tFuckDetroit, reinterpret_cast<LPVOID*>(&fpFuckDetroit)) != MH_OK)
+	if (MH_CreateHook(hookAddress, &tHookOn, reinterpret_cast<LPVOID*>(&fpHookOn)) != MH_OK)
 	{
 		return;
 	}
