@@ -79,7 +79,7 @@ INT64* tHookOn(INT64* unk1, INT64 a2)
 			if (str[i] == '/')
 				outfile << '\\';
 			else
-				outfile << str[i];
+				outfile << char(tolower(str[i]));
 		}
 
 	}
