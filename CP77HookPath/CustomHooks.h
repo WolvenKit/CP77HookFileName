@@ -1,12 +1,16 @@
 #include <Windows.h>
 #include "MinHook.h"
-#include <iostream>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <fstream>
 #include "AOBScanner.h"
 #include <mutex>          // std::mute
-#include <algorithm>
+#include <thread>
+#include <iostream>
+#include <chrono>
+#include <vector>
+#include <map>
 
 extern "C" void GetRax(INT64);
 extern "C" INT64 SetRax(INT64);

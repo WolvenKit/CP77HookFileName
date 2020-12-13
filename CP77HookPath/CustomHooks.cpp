@@ -1,34 +1,55 @@
 #include "CustomHooks.h"
 
+
 std::ofstream outfile;
 std::mutex mtx;
 
 
+std::multimap<std::string,int> CurrentHashLst;
 std::vector<std::string> memoryFilenames;
-std::vector<std::string> CurrentHashLst;
+
+std::wstring ExePath() {
+	TCHAR buffer[MAX_PATH] = { 0 };
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
+	return std::wstring(buffer).substr(0, pos);
+}
+std::wstring s2ws(const std::string& str)
+{
+	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+	std::wstring wstrTo(size_needed, 0);
+	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+	return wstrTo;
+}
 
 void LoadCurrentHash()
 {
 	std::ifstream csv;
-	csv.open("archivehashes.csv", std::ios::in);
+	std::wstring path = ExePath() + s2ws("\\missinghashes.txt");
+	csv.open(path, std::ios::in);
+	int i = 0;
 	if (csv.is_open())
 	{
 		std::string hashnumber;
 		while (getline(csv, hashnumber))
 		{
-			hashnumber = hashnumber.substr(hashnumber.find(',') + 1, hashnumber.length() - 1);
-			CurrentHashLst.push_back(hashnumber);
+			CurrentHashLst.insert(std::pair<std::string, int>(hashnumber, i));
 		}
+
 	}
 	else
 	{
 		AllocConsole();
 		freopen("CONOUT$", "w", stdout);
+		
+		printf("Missing file ");
+		wprintf(path.c_str());
+		printf("\n");
+		printf("Please download it from CP77 Modding Tools discord in 'hash' channel\nLink invite: https://discord.gg/NTA2t5GngV \n");
+		printf("Then copy it into ");
+		wprintf(ExePath().c_str());
 
-		printf("Missing archivehashes.csv file\n");
-		printf("Please download it from https://github.com/rfuzzo/CP77Tools/blob/main/CP77Tools/Resources/archivehashes.csv \n");
-		printf("Then copy it into 'Cyberpunk 2077\\bin\\x64'\n");
-		printf("Thank you !!!\n");
+		printf("\nThank you !!!\n");
 		system("pause");
 		FreeConsole();
 	}
@@ -36,26 +57,41 @@ void LoadCurrentHash()
 
 bool HashExist(std::string hash, std::vector<std::string> CurrentHashLst)
 {
+
 	return std::any_of(CurrentHashLst.begin(), CurrentHashLst.end(), compare(hash));
 }
 
-void WriteFilenames(std::vector<std::string>& memoryFilenames, std::vector<std::string> CurrentHashLst)
+void WriteFilenames(std::vector<std::string> memoryFilenames, std::multimap<std::string, int> CurrentHashLst)
 {
-	std::string temp;
-	for (int i = 0; i < memoryFilenames.size(); i++)
+
+
+
+	std::string templine;
+	templine = "";
+
+
+
+	for (long long i = 0; i < memoryFilenames.size(); i++)
 	{
+
 		std::string hash = memoryFilenames[i].substr(memoryFilenames[i].find(',') + 1, memoryFilenames[i].length() - 1);
-		if (!HashExist(hash, CurrentHashLst))
+		
+		if(CurrentHashLst.find(hash) != CurrentHashLst.end())
 		{
-			temp += memoryFilenames[i];
-			temp += '\n';
+			templine += memoryFilenames[i];
+			templine += '\n';
+			
 		}
 	}
-	memoryFilenames.clear();
 
 	outfile.open("Cyberpunk2077.log", std::ios::out | std::ios::app);
-	outfile << temp;
+	outfile << templine;
 	outfile.close();
+
+
+
+
+
 }
 
 
@@ -72,9 +108,11 @@ HOOKON fpHookOn = NULL;
 
 
 int counthash = 0;
-
+int temphash = 0;
+bool check = 0;
 INT64* tHookOn(INT64* unk1, INT64 a2)
 {
+
 	int rax = 0;
 	GetRax(rax);
 	int v2 = *(UINT*)(a2 + 8);
@@ -123,8 +161,12 @@ INT64* tHookOn(INT64* unk1, INT64 a2)
 
 	}
 	// Orignal Function
+
+
 	SetRax(rax);
 	INT64* res = fpHookOn(unk1, a2);
+
+
 
 	if (size > 0)
 	{
@@ -136,11 +178,14 @@ INT64* tHookOn(INT64* unk1, INT64 a2)
 	mtx.lock();
 	if (size > 0)
 		memoryFilenames.push_back(line);
-	counthash += 1;
-	if (counthash % 10000 == 0)
+
+	if (memoryFilenames.size() % 10000 == 0)
 	{
-		WriteFilenames(memoryFilenames, CurrentHashLst);
-		counthash = 0;
+		if (!memoryFilenames.empty())
+		{
+			WriteFilenames(memoryFilenames, CurrentHashLst);
+			memoryFilenames.clear();
+		}
 	}
 	mtx.unlock();
 
@@ -152,6 +197,7 @@ INT64* tHookOn(INT64* unk1, INT64 a2)
 void SetupHooks()
 {
 	LoadCurrentHash();
+	
 	LPVOID hookAddress = GetArchiveFunctionAddress();
 	MH_Initialize();
 
