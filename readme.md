@@ -13,3 +13,5 @@ If you want to contribute to [Cyberpunk 2077 modding tool](https://github.com/rf
 ### Downloads: [Here](https://github.com/ducan0124567/CP77HookFileName/releases)
 ### How to uninstall:
 - Delete 2 dlls
+
+## Thanks to TrikzMe for testing
