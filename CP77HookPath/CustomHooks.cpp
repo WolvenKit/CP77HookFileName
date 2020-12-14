@@ -5,7 +5,7 @@ std::ofstream outfile;
 std::mutex mtx;
 
 
-std::multimap<std::string,int> CurrentHashLst;
+std::map<std::string,int> CurrentHashLst;
 std::vector<std::string> memoryFilenames;
 
 std::wstring ExePath() {
@@ -55,21 +55,12 @@ void LoadCurrentHash()
 	}
 }
 
-bool HashExist(std::string hash, std::vector<std::string> CurrentHashLst)
+
+void WriteFilenames(std::vector<std::string> memoryFilenames, std::map<std::string, int> CurrentHashLst)
 {
-
-	return std::any_of(CurrentHashLst.begin(), CurrentHashLst.end(), compare(hash));
-}
-
-void WriteFilenames(std::vector<std::string> memoryFilenames, std::multimap<std::string, int> CurrentHashLst)
-{
-
-
 
 	std::string templine;
 	templine = "";
-
-
 
 	for (long long i = 0; i < memoryFilenames.size(); i++)
 	{
@@ -80,17 +71,13 @@ void WriteFilenames(std::vector<std::string> memoryFilenames, std::multimap<std:
 		{
 			templine += memoryFilenames[i];
 			templine += '\n';
-			
+			CurrentHashLst.erase(hash);
 		}
 	}
 
 	outfile.open("Cyberpunk2077.log", std::ios::out | std::ios::app);
 	outfile << templine;
 	outfile.close();
-
-
-
-
 
 }
 
@@ -213,6 +200,3 @@ void SetupHooks()
 
 	//HANDLE myhandleB = (HANDLE)_beginthreadex(0, 0, &ExitHook, 0, 0, 0);
 }
-
-
-

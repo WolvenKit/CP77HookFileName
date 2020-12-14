@@ -8,7 +8,7 @@
 #include <mutex>          // std::mute
 #include <thread>
 #include <iostream>
-#include <chrono>
+
 #include <vector>
 #include <map>
 
@@ -17,15 +17,3 @@ extern "C" INT64 SetRax(INT64);
 extern "C" void GetAL(BYTE);
 
 __declspec(dllexport) void SetupHooks();
-void UnHooks();
-
-struct compare
-{
-    std::string key;
-    compare(std::string const& i) : key(i) { }
-
-    bool operator()(std::string const& i)
-    {
-        return (i == key);
-    }
-};
