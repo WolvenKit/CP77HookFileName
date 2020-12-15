@@ -71,7 +71,7 @@ void WriteFilenames(std::vector<std::string> memoryFilenames, std::map<std::stri
 		{
 			templine += memoryFilenames[i];
 			templine += '\n';
-			CurrentHashLst.erase(hash);
+			//CurrentHashLst.erase(hash);
 		}
 	}
 
